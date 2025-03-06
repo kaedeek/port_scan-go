@@ -11,10 +11,6 @@ A simple concurrent port scanner that performs TCP port scanning from port 1 to 
 - Automatic identification of well-known services (FTP, SSH, HTTP, etc.)
 - Scan results output to log file
 
-## Requirements
-
-- Go 1.16 or higher
-
 ## Installation
 
 ```bash
