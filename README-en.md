@@ -1,58 +1,53 @@
 # Port Scanner
 
-A simple concurrent port scanner that performs TCP port scanning from port 1 to 1024 on a specified IP address.
+A simple concurrent port scanner that performs TCP port scanning from port 0 to 65535 on a specified IP address.
 
-[Japan](README-ja.md)
+[Japanese](README.md)
 
 ## Features
 
-- TCP port scanning for specified IP addresses
-- High-speed scanning with concurrent processing
-- Automatic identification of well-known services (FTP, SSH, HTTP, etc.)
-- Scan results output to log file
+- **TCP port scanning for specified IP addresses**
+- **Fast scanning execution with concurrent processing**
+- **Automatic identification of well-known services (FTP, SSH, HTTP, etc.)**
+- **Scan results output to log file**
 
-## Installation
+> [!CAUTION]
+> Prohibited Actions:
+>
+> - This tool is created for educational purposes
+> - Obtain permission from the system owner before performing port scanning
+> - Improper use may lead to legal issues
 
-```bash
-git clone https://github.com/kaedeek/port_scan-go.git
-cd port_scan-go
-```
-
-## Usage
-
-```bash
-go run main.go -ip <target_ip>
-```
-
-### Example
-
-```bash
-go run main.go -ip 000.000.0.0
-```
-
-Scan results are saved in the `scan.log` file.
 
 ## Scan Results
 
-The scan results are output to the log file in the following format:
+Scan results are output in the following format
 
 ```
-2024/03/XX HH:MM:SS Starting port scan on 000.000.0.0 (ports 1-1024)
-2024/03/XX HH:MM:SS Port 22 is open (SSH)
-2024/03/XX HH:MM:SS Port 80 is open (HTTP)
-2024/03/XX HH:MM:SS Port 443 is open (HTTPS)
-2024/03/XX HH:MM:SS Scan completed
+[+] 2025-06-04 23:25:09 : Please enter an IP address to scan:
+000.000.0.0
+[+] 2025-06-04 23:25:11 : Port scan started | 000.000.0.0 (Press 'e' to stop)
+
+
+[-] 80 | HTTP Open
+[-] 53 | DNS Open
+[-] 27998 | Unknown Open
+[-] 37444 | Unknown Open
+[-] 37443 | Unknown Open
+[-] 49652 | Unknown Open
+[-] 49653 | Unknown Open
+[+] 2025-06-04 23:26:18 : Scan completed :)
+
+
+[+] 2025-06-04 23:26:18 : Press Enter to exit...
 ```
 
-## Important Notes
+## EXE FILE LIST
 
-- This tool is created for educational purposes
-- Please obtain permission from the system owner before performing port scans
-- Improper use may result in legal issues
+[EXE FILE](exe/portscanner.exe)
 
-## License
+## Message List
 
-MIT License with additional restrictions.
-Copyright (c) 2025 kaedeek
-
-See the LICENSE file for details.
+| Message                                | Description                |
+| --------------------------------------| -------------------------- |
+| `Unknown Open`                        | No service name            |
