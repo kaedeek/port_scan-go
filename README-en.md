@@ -18,15 +18,14 @@ A simple concurrent port scanner that performs TCP port scanning from port 0 to 
 > - Obtain permission from the system owner before performing port scanning
 > - Improper use may lead to legal issues
 
-
 ## Scan Results
 
 Scan results are output in the following format
 
 ```
-[+] 2025-06-04 23:25:09 : Please enter an IP address to scan:
+[+] Please enter an IP address to scan:
 000.000.0.0
-[+] 2025-06-04 23:25:11 : Port scan started | 000.000.0.0 (Press 'e' to stop)
+[+] Port scan started | 000.000.0.0 (Press 'e' to stop)
 
 
 [-] 80 | HTTP Open
@@ -36,10 +35,10 @@ Scan results are output in the following format
 [-] 37443 | Unknown Open
 [-] 49652 | Unknown Open
 [-] 49653 | Unknown Open
-[+] 2025-06-04 23:26:18 : Scan completed :)
+[+] Scan completed :)
 
 
-[+] 2025-06-04 23:26:18 : Press Enter to exit...
+[+] Press Enter to exit...
 ```
 
 ## EXE FILE LIST
@@ -48,6 +47,6 @@ Scan results are output in the following format
 
 ## Message List
 
-| Message                                | Description                |
-| --------------------------------------| -------------------------- |
-| `Unknown Open`                        | No service name            |
+| Message        | Description     |
+| -------------- | --------------- |
+| `Unknown Open` | No service name |
