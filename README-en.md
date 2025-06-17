@@ -9,7 +9,6 @@ A simple concurrent port scanner that performs TCP port scanning from port 0 to 
 - **TCP port scanning for specified IP addresses**
 - **Fast scanning execution with concurrent processing**
 - **Automatic identification of well-known services (FTP, SSH, HTTP, etc.)**
-- **Scan results output to log file**
 
 > [!CAUTION]
 > Prohibited Actions:
