@@ -1,16 +1,14 @@
 package main
 
 import (
-	"bufio"
-	"context"
+	"flag"
 	"fmt"
 	"net"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
-	"github.com/kaedeek/port_scan-go/logger"
+	versalog "github.com/VersaLog/VersaLog.go/VersaLog"
 )
 
 const (
@@ -19,6 +17,28 @@ const (
 	timeout        = time.Second
 	maxConcurrency = 1000
 )
+
+type ScanResult struct {
+	Port    int
+	IsOpen  bool
+	Service string
+}
+
+func ScanPort(ip string, port int) ScanResult {
+	address := net.JoinHostPort(ip, fmt.Sprintf("%d", port))
+	result := ScanResult{Port: port}
+
+	conn, err := net.DialTimeout("tcp", address, timeout)
+	if err != nil {
+		result.IsOpen = false
+		return result
+	}
+	defer conn.Close()
+
+	result.IsOpen = true
+	result.Service = getServiceName(port)
+	return result
+}
 
 func getServiceName(port int) string {
 	services := map[int]string{
@@ -96,62 +116,46 @@ func getServiceName(port int) string {
 	return "Unknown"
 }
 
-func ScanPort(ctx context.Context, ip string, port int, wg *sync.WaitGroup, sem chan struct{}, mu *sync.Mutex) {
-	defer wg.Done()
-
-	select {
-	case <-ctx.Done():
-		return
-	case sem <- struct{}{}:
-	}
-
-	defer func() { <-sem }()
-
-	address := net.JoinHostPort(ip, fmt.Sprintf("%d", port))
-	conn, err := net.DialTimeout("tcp", address, timeout)
-	if err == nil {
-		conn.Close()
-		service := getServiceName(port)
-		mu.Lock()
-		logger.LogV2(fmt.Sprintf("%d | %s Open", port, service))
-		mu.Unlock()
-	}
-}
-
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-	logger.LogV1("Please enter an IP address to scan: ")
-	ip, _ := reader.ReadString('\n')
-	ip = strings.TrimSpace(ip)
+	logger := versalog.NewVersaLog("simple2", false, true, "Scan", false, true, true, nil, false, false)
 
-	logger.LogV1(fmt.Sprintf("Port scan started | %s (Press 'e' to stop)", ip) + "\n\n")
+	ip := flag.String("ip", "", "Target IP address to scan")
+	flag.Parse()
 
+	if *ip == "" {
+		fmt.Println("Error: IP address is required")
+		fmt.Println("Usage: go run main.go -ip <target_ip>")
+		os.Exit(1)
+	}
+
+	logger.Info(fmt.Sprintf("Starting port scan on %s\n", *ip))
+
+	// Create channels for results and synchronization
+	results := make(chan ScanResult, endPort-startPort+1)
 	var wg sync.WaitGroup
-	var mu sync.Mutex
-	sem := make(chan struct{}, maxConcurrency)
 
-	ctx, cancel := context.WithCancel(context.Background())
-
-	go func() {
-		keyReader := bufio.NewReader(os.Stdin)
-		for {
-			char, _ := keyReader.ReadByte()
-			if char == 'e' || char == 'E' {
-				cancel()
-				logger.LogV1("\nScan stopped :(")
-				return
-			}
-		}
-	}()
-
+	// Launch port scanning goroutines
 	for port := startPort; port <= endPort; port++ {
 		wg.Add(1)
-		go ScanPort(ctx, ip, port, &wg, sem, &mu)
+		go func(p int) {
+			defer wg.Done()
+			result := ScanPort(*ip, p)
+			if result.IsOpen {
+				results <- result
+			}
+		}(port)
 	}
 
-	wg.Wait()
-	logger.LogV1("Scan completed :)\n")
+	// Wait for all scans to complete in a separate goroutine
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
 
-	logger.LogV1("Press Enter to exit...")
-	reader.ReadBytes('\n')
+	// Process and log results
+	for result := range results {
+		logger.Info(fmt.Sprintf("Port %d is open (%s)\n", result.Port, result.Service))
+	}
+
+	logger.Info("Scan completed")
 }
